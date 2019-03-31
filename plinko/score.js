@@ -1,5 +1,4 @@
 const outputs = [];
-const k = 100;
 const COL_POSITION = 0;
 const COL_BUCKET = 3;
 
@@ -9,18 +8,24 @@ function onScoreUpdate(dropPosition, bounciness, size, bucketLabel) {
 }
 
 function runAnalysis() {
-  
-  const [testSet, trainingSet] = splitDataSet(outputs, 10);
-  
-  for (let i = 0; i < testSet.length; i++) {
-    const bucket = knn(trainingSet, testSet[i][COL_POSITION]);
-    console.log(bucket, testSet[i][COL_BUCKET]);
-  }
+  const testSetSize = 50;
+  const [testSet, trainingSet] = splitDataSet(outputs, testSetSize);
 
+
+  _.range(1, 101).forEach(k => {
+    const acuracy = _.chain(testSet)
+      .filter(testPoint => knn(trainingSet, testPoint[COL_POSITION], k) === testPoint[COL_BUCKET])
+      .size()
+      .divide(testSetSize)
+      .value();
+    
+      console.log(`With K=${k} the accuracy was ${acuracy}`);
+  })
+  
   // alert(`Droping from position ${predictedPoint} your ball probability will fall in ${result} bucket`);
 }
 
-function knn(data, predictedPoint) {
+function knn(data, predictedPoint, k) {
   return _.chain(data)
     //get bucket and distance between predicted point
     .map(row => [row[COL_BUCKET], distance(row[COL_POSITION], predictedPoint)])
