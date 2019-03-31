@@ -39,6 +39,12 @@ function distance(point, point2) {
 }
 
 
+function splitDataSet(dataset, testCount) {
+  const shuffled = _.shuffle(dataset);
+  const testSet = _.slice(shuffled, 0, testCount);
+  const trainingSet = _.slice(shuffled, testCount);
 
+  return [testSet, trainingSet];
+}
 
 
