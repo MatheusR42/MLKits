@@ -1,6 +1,4 @@
 const outputs = [];
-const COL_POSITION = 0;
-const COL_BUCKET = 3;
 
 function onScoreUpdate(dropPosition, bounciness, size, bucketLabel) {
   // Ran every time a balls drops into a bucket
@@ -28,25 +26,22 @@ function runAnalysis() {
 }
 
 function knn(trainingSet, point, k) {
-  const INDEX_DISTANCE = 1;
-  const INDEX_BUCKET = 0;
-
   return _.chain(trainingSet)
     //get bucket and distance between predicted point
     .map(row => {
       return [
-        row[COL_BUCKET],
-        distance(_.initial(row), point)
+        distance(_.initial(row), point),
+        _.last(row),
       ]
     })
     //sort by distance
-    .sortBy(row => row[INDEX_DISTANCE])
+    .sortBy(row => _.first(row))
 
     //get nearest values
     .slice(0, k)
 
     //count how many times each bucket appears
-    .countBy(row => row[INDEX_BUCKET])
+    .countBy(row => _.last(row))
     
     //get the bucket that repeat most
     .toPairs()
