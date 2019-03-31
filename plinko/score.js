@@ -8,13 +8,13 @@ function onScoreUpdate(dropPosition, bounciness, size, bucketLabel) {
 }
 
 function runAnalysis() {
-  const testSetSize = 50;
+  const testSetSize = 100;
   const [testSet, trainingSet] = splitDataSet(outputs, testSetSize);
 
 
-  _.range(1, 101).forEach(k => {
+  _.range(1, 20).forEach(k => {
     const acuracy = _.chain(testSet)
-      .filter(testPoint => knn(trainingSet, testPoint[COL_POSITION], k) === testPoint[COL_BUCKET])
+      .filter(testPoint => knn(trainingSet, _.initial(testPoint), k) === testPoint[COL_BUCKET])
       .size()
       .divide(testSetSize)
       .value();
@@ -25,19 +25,26 @@ function runAnalysis() {
   // alert(`Droping from position ${predictedPoint} your ball probability will fall in ${result} bucket`);
 }
 
-function knn(data, predictedPoint, k) {
-  return _.chain(data)
-    //get bucket and distance between predicted point
-    .map(row => [row[COL_BUCKET], distance(row[COL_POSITION], predictedPoint)])
+function knn(trainingSet, point, k) {
+  const INDEX_DISTANCE = 1;
+  const INDEX_BUCKET = 0;
 
+  return _.chain(trainingSet)
+    //get bucket and distance between predicted point
+    .map(row => {
+      return [
+        row[COL_BUCKET],
+        distance(_.initial(row), point)
+      ]
+    })
     //sort by distance
-    .sortBy(row => row[1])
+    .sortBy(row => row[INDEX_DISTANCE])
 
     //get nearest values
     .slice(0, k)
 
     //count how many times each bucket appears
-    .countBy(row => row[0])
+    .countBy(row => row[INDEX_BUCKET])
     
     //get the bucket that repeat most
     .toPairs()
