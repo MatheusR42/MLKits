@@ -9,17 +9,19 @@ function onScoreUpdate(dropPosition, bounciness, size, bucketLabel) {
 
 function runAnalysis() {
   const testSetSize = 50;
-  const [testSet, trainingSet] = splitDataSet(minMax(outputs, 3), testSetSize);
-
-
-  _.range(1, 101).forEach(k => {
+  const k = 10;
+  
+  _.range(0, 3).forEach(feature => {
+    const data = outputs.map(row => [row[feature], _.last(row)]);
+    const [testSet, trainingSet] = splitDataSet(minMax(data, 1), testSetSize);
+    
     const acuracy = _.chain(testSet)
-      .filter(testPoint => knn(trainingSet, testPoint[COL_POSITION], k) === testPoint[COL_BUCKET])
+      .filter(testPoint => knn(trainingSet, testPoint[COL_POSITION], k) === _.last(testPoint))
       .size()
       .divide(testSetSize)
       .value();
     
-      console.log(`With K=${k} the accuracy was ${acuracy}`);
+      console.log(`With feature ${feature} the accuracy was ${acuracy}`);
   })
   
   // alert(`Droping from position ${predictedPoint} your ball probability will fall in ${result} bucket`);
